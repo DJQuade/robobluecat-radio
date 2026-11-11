@@ -6,21 +6,17 @@
   <meta name="theme-color" content="#100b1d">
   <meta name="description" content="Walk the streets of Japan with RoboBlueCat, archived DJ Quade sets, and live chat.">
   <title>RoboBlueCat Radio</title>
-  <link rel="icon" href="assets/radio.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=2">
-  <script type="module" src="app.js?v=2"></script>
+  <link rel="icon" href="assets/cool-cat-crew.webp" type="image/webp">
+  <link rel="stylesheet" href="style.css?v=3">
+  <script type="module" src="app.js?v=3"></script>
 </head>
 <body>
   <div class="site" id="site">
     <header class="masthead">
       <a class="wordmark" href="./" aria-label="RoboBlueCat Radio home">
-        <img src="assets/radio.svg" alt="" width="42" height="42">
+        <img src="assets/cool-cat-crew.webp" alt="Cool Cat Crew" width="42" height="42">
         <h1>RoboBlueCat<span class="wordmark-radio"> Radio</span></h1>
       </a>
-      <nav class="quick-links" aria-label="Radio controls">
-        <a href="#radio">Radio</a>
-        <a href="#chat">Chat</a>
-      </nav>
     </header>
 
     <main class="watch-layout">
@@ -58,12 +54,15 @@
       <section class="radio" id="radio" aria-labelledby="radio-title">
         <div class="radio-heading">
           <h2 id="radio-title">DJ Quade Radio</h2>
-          <a class="external" id="playlist-link" href="https://www.youtube.com/playlist?list=PL7KeUQEsiTQvghfORVy2f2ZTnRG67ONBL" target="_blank" rel="noopener">YouTube <span aria-hidden="true">↗</span></a>
+          <button class="outline" id="radio-toggle" type="button" aria-expanded="false" aria-controls="radio-panel">Show YouTube player</button>
         </div>
-        <div class="player" id="player"></div>
-        <div class="radio-feedback">
-          <p id="radio-status" role="status">Tuning in…</p>
-          <button class="outline" id="radio-action" type="button" hidden>Enable sound</button>
+        <div id="radio-panel" hidden>
+          <div class="player" id="player"></div>
+          <div class="radio-feedback">
+            <p id="radio-status" role="status">Tuning in…</p>
+            <button class="outline" id="radio-action" type="button" hidden>Enable sound</button>
+          </div>
+          <a class="external" id="playlist-link" href="https://www.youtube.com/playlist?list=PL7KeUQEsiTQvghfORVy2f2ZTnRG67ONBL" target="_blank" rel="noopener">Open playlist on YouTube <span aria-hidden="true">↗</span></a>
         </div>
       </section>
 

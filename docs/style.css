@@ -22,16 +22,14 @@ a { color: inherit; }
 :focus-visible { outline: 3px solid #ff9adf; outline-offset: 4px; }
 .site { max-width: 1520px; margin: auto; padding: 0 clamp(14px, 2.5vw, 38px); }
 .masthead { min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.wordmark, .quick-links { display: flex; align-items: center; gap: 12px; }
-.wordmark { text-decoration: none; }
+.wordmark { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .wordmark h1 { margin: 0; font-size: clamp(1rem, 2vw, 1.28rem); letter-spacing: -.055em; }
 .wordmark-radio { color: var(--pink); }
 .panel-kicker, #walk-status, .effects label, .effects output, .chat-status {
   font: 600 .71rem/1.3 "IBM Plex Mono", ui-monospace, monospace;
   letter-spacing: .09em;
 }
-.quick-links { gap: clamp(8px, 2.2vw, 26px); }
-.quick-links a, .external, footer a { font-size: .84rem; text-underline-offset: 4px; text-decoration-color: #9563ac; }
+.external, footer a { font-size: .84rem; text-underline-offset: 4px; text-decoration-color: #9563ac; }
 .outline { border: 1px solid #916489; border-radius: 7px; padding: 7px 11px; background: #170c23de; color: var(--text); }
 .outline:hover, .reset:hover { background: #42234f; }
 .walk {
@@ -98,7 +96,9 @@ a { color: inherit; }
 .external { white-space: nowrap; color: var(--quiet); }
 .radio { grid-area: radio; width: min(100%, 364px); scroll-margin-top: 12px; }
 .radio-heading, .radio-feedback { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.radio-heading { min-height: 35px; }
+.radio-heading { min-height: 42px; }
+.radio-heading .outline { font-size: .8rem; padding: 5px 8px; }
+#radio-panel { margin-top: 6px; scroll-margin-block: 10px; }
 .player { overflow: hidden; border-radius: 9px; min-height: 200px; background: #09070e; }
 .player iframe { display: block; width: 100%; height: 200px; border: 0; }
 .radio-feedback { min-height: 39px; }
@@ -140,8 +140,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; padding: 25px
   .masthead { min-height: 58px; }
   .wordmark { gap: 7px; }
   .wordmark img { width: 33px; height: 33px; }
-  .quick-links { gap: 10px; }
-  .quick-links a { font-size: .79rem; }
   .walk { border-radius: 11px; }
   .cat { width: max(110%, 350px); bottom: -1%; }
 }

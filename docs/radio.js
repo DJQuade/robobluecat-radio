@@ -4,6 +4,8 @@ const BUFFERING = 3;
 const CUED = 5;
 
 export function initRadio(playlist) {
+  const toggle = document.getElementById('radio-toggle');
+  const panel = document.getElementById('radio-panel');
   const container = document.getElementById('player');
   const status = document.getElementById('radio-status');
   const action = document.getElementById('radio-action');
@@ -15,17 +17,18 @@ export function initRadio(playlist) {
     autoplay: '0', enablejsapi: '1', origin: location.origin,
   });
   iframe.title = 'DJ Quade archived sets on YouTube';
-  iframe.src = url;
   iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   iframe.allowFullscreen = true;
   iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-  container.append(iframe);
   playlistLink.href = 'https://www.youtube.com/playlist?list=' + playlist;
 
   let player;
+  let loaded = false;
+  let open = false;
   let visible = false;
   let cinema = false;
-  let resumeAfterCinema = false;
+  let resumePending = false;
+  let playbackRequested = false;
   let firstPlay = false;
   let initialIndex;
   let attempt = 'waiting';
@@ -46,6 +49,26 @@ export function initRadio(playlist) {
     }, 12000);
   }
 
+  function requestPlayback(play) {
+    playbackRequested = true;
+    watchStartup();
+    play();
+  }
+
+  function displayed() {
+    return open && !cinema;
+  }
+
+  function pausePlayback() {
+    if (!player) return;
+    if (playbackRequested || [PLAYING, BUFFERING].includes(player.getPlayerState())) {
+      resumePending = true;
+      playbackRequested = false;
+      clearTimeout(startupTimer);
+      player.pauseVideo();
+    }
+  }
+
   function pickSet() {
     const videos = player.getPlaylist?.();
     if (!videos?.length) return false;
@@ -57,7 +80,13 @@ export function initRadio(playlist) {
   }
 
   function tryAutoplay() {
-    if (!player || !visible || document.hidden || cinema || firstPlay) return;
+    if (!player || !displayed() || !visible || document.hidden) return;
+    if (resumePending) {
+      resumePending = false;
+      requestPlayback(() => player.playVideo());
+      return;
+    }
+    if (firstPlay) return;
     if (attempt === 'waiting') {
       if (!pickSet()) return;
       attempt = 'sound';
@@ -68,15 +97,13 @@ export function initRadio(playlist) {
       return;
     }
     clearInterval(tuningTimer);
-    watchStartup();
-    player.playVideoAt(initialIndex);
+    requestPlayback(() => player.playVideoAt(initialIndex));
   }
 
   const observer = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting && entry.intersectionRatio >= .51;
     tryAutoplay();
   }, { threshold: [.51] });
-  observer.observe(iframe);
   document.addEventListener('visibilitychange', tryAutoplay);
 
   function onReady({ target }) {
@@ -104,25 +131,31 @@ export function initRadio(playlist) {
     } else if (data === PLAYING) {
       clearTimeout(startupTimer);
       clearInterval(tuningTimer);
+      playbackRequested = false;
       firstPlay = true;
       attempt = 'done';
-      observer.disconnect();
-      if (cinema) {
-        resumeAfterCinema = true;
+      if (!displayed()) {
+        resumePending = true;
         target.pauseVideo();
+        return;
       }
       const muted = target.isMuted();
       update(muted ? 'Playing muted' : 'Playing', muted ? 'Enable sound' : '');
     } else if (data === BUFFERING) {
-      update('Buffering…');
-    } else if (data === PAUSED && firstPlay) {
-      update('Paused');
+      if (displayed()) update('Buffering…');
+      else pausePlayback();
+    } else if (data === PAUSED) {
+      playbackRequested = false;
+      clearTimeout(startupTimer);
+      if (firstPlay) update('Paused');
     }
   }
 
   function onAutoplayBlocked() {
     clearTimeout(startupTimer);
+    playbackRequested = false;
     if (attempt === 'sound') {
+      resumePending = false;
       attempt = 'retry-muted';
       tryAutoplay();
       return;
@@ -133,29 +166,29 @@ export function initRadio(playlist) {
 
   function onError({ data }) {
     clearTimeout(startupTimer);
+    playbackRequested = false;
+    resumePending = false;
     // Skip unavailable playlist entries during the initial automatic selection.
-    if (!firstPlay && visible && !document.hidden && !cinema && [100, 101, 150].includes(data)
+    if (!firstPlay && displayed() && visible && !document.hidden && [100, 101, 150].includes(data)
         && initialIndex !== undefined && pickSet()) {
-      watchStartup();
-      player.playVideoAt(initialIndex);
+      requestPlayback(() => player.playVideoAt(initialIndex));
       return;
     }
     update('This set is unavailable here. Open the playlist on YouTube.');
   }
 
   action.addEventListener('click', () => {
-    if (!player) return;
+    if (!player || !displayed()) return;
     attempt = 'done';
     player.unMute();
     if (player.getPlayerState() === PLAYING) {
       update('Playing');
       return;
     }
-    watchStartup();
     if (!firstPlay && initialIndex !== undefined && player.getPlaylistIndex() !== initialIndex) {
-      player.playVideoAt(initialIndex);
+      requestPlayback(() => player.playVideoAt(initialIndex));
     } else {
-      player.playVideo();
+      requestPlayback(() => player.playVideo());
     }
   });
 
@@ -165,9 +198,20 @@ export function initRadio(playlist) {
     });
   }
 
-  if (window.YT?.Player) {
-    attachPlayer();
-  } else {
+  function loadPlayer() {
+    if (loaded) return;
+    loaded = true;
+    iframe.src = url;
+    container.append(iframe);
+
+    startupTimer = setTimeout(() => {
+      if (!player) update('Press play in the YouTube player or open the playlist on YouTube.');
+    }, 12000);
+
+    if (window.YT?.Player) {
+      attachPlayer();
+      return;
+    }
     window.onYouTubeIframeAPIReady = attachPlayer;
     const script = document.createElement('script');
     script.src = 'https://www.youtube.com/iframe_api';
@@ -179,23 +223,30 @@ export function initRadio(playlist) {
     document.head.append(script);
   }
 
-  startupTimer = setTimeout(() => {
-    if (!player) update('Press play in the YouTube player or open the playlist on YouTube.');
-  }, 12000);
+  toggle.addEventListener('click', () => {
+    open = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Hide YouTube player' : 'Show YouTube player';
+    if (!open) pausePlayback();
+    panel.hidden = !open;
+    if (!open) {
+      observer.unobserve(iframe);
+      visible = false;
+      return;
+    }
+    loadPlayer();
+    observer.observe(iframe);
+    const bounds = container.getBoundingClientRect();
+    if (Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0) <= bounds.height / 2) {
+      toggle.scrollIntoView({ block: 'start' });
+    }
+  });
 
   return {
     setCinemaMode(enabled) {
       cinema = enabled;
-      if (!player) return;
-      if (enabled) {
-        resumeAfterCinema = [PLAYING, BUFFERING].includes(player.getPlayerState());
-        if (resumeAfterCinema) player.pauseVideo();
-      } else if (resumeAfterCinema) {
-        resumeAfterCinema = false;
-        player.playVideo();
-      } else {
-        tryAutoplay();
-      }
+      if (enabled) pausePlayback();
+      else tryAutoplay();
     },
   };
 }
