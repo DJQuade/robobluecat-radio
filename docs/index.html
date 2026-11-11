@@ -8,7 +8,7 @@
   <title>RoboBlueCat Radio</title>
   <link rel="icon" href="assets/cool-cat-crew.webp" type="image/webp">
   <link rel="stylesheet" href="style.css?v=3">
-  <script type="module" src="app.js?v=3"></script>
+  <script type="module" src="app.js?v=4"></script>
 </head>
 <body>
   <div class="site" id="site">
@@ -54,9 +54,9 @@
       <section class="radio" id="radio" aria-labelledby="radio-title">
         <div class="radio-heading">
           <h2 id="radio-title">DJ Quade Radio</h2>
-          <button class="outline" id="radio-toggle" type="button" aria-expanded="false" aria-controls="radio-panel">Show YouTube player</button>
+          <button class="outline" id="radio-toggle" type="button" aria-expanded="true" aria-controls="radio-panel">Hide YouTube player</button>
         </div>
-        <div id="radio-panel" hidden>
+        <div id="radio-panel">
           <div class="player" id="player"></div>
           <div class="radio-feedback">
             <p id="radio-status" role="status">Tuning in…</p>

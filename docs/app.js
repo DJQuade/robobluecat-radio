@@ -1,6 +1,6 @@
 import { config } from './config.js';
 import { initChat } from './chat.js';
-import { initRadio } from './radio.js?v=3';
+import { initRadio } from './radio.js?v=4';
 
 const byId = (id) => document.getElementById(id);
 const walk = byId('walk');

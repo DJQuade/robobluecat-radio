@@ -24,7 +24,7 @@ export function initRadio(playlist) {
 
   let player;
   let loaded = false;
-  let open = false;
+  let open = !panel.hidden;
   let visible = false;
   let cinema = false;
   let resumePending = false;
@@ -241,6 +241,11 @@ export function initRadio(playlist) {
       toggle.scrollIntoView({ block: 'start' });
     }
   });
+
+  if (open) {
+    loadPlayer();
+    observer.observe(iframe);
+  }
 
   return {
     setCinemaMode(enabled) {
