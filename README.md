@@ -4,7 +4,7 @@ Static radio room with a muted Japan walk, the supplied animated RoboBlueCat, DJ
 
 Serve `docs/` over HTTP for local development. On GitHub Pages, use the `main` branch and `/docs`. The folder also works as a Render static publish directory wherever bandwidth and domain limits fit the budget.
 
-The licensed footage is a separate GitHub release asset. The streaming copy is 720p H.264 with fast-start and no audio track. The original file is stored separately. Visual effects are browser-side CSS, and the original GIF plays over the effects layer.
+The 720p desktop copy of the licensed footage is a GitHub release asset. iPhone and iPad use a lighter, same-origin H.264 MP4, which also serves as the fallback if the desktop copy stalls. Both versions use fast-start and have no audio track. Visual effects are browser-side CSS, and the original GIF plays over the effects layer.
 
 The YouTube player is shown below the walk and selects a random playlist entry when enough of the player is visible. Browsers that block sound autoplay get a muted retry and an Enable sound button. Playback pauses while the player is hidden or cinema mode covers the page.
 
