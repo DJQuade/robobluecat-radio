@@ -1,5 +1,6 @@
 import { config } from './config.js';
 import { initChat } from './chat.js';
+import { initRadio } from './radio.js?v=2';
 
 const byId = (id) => document.getElementById(id);
 const walk = byId('walk');
@@ -112,11 +113,13 @@ loadWalk();
 
 const cinema = byId('cinema');
 const cinemaExit = byId('cinema-exit');
-const outsideCinema = [document.querySelector('.masthead'), document.querySelector('.effects'),
-  document.querySelector('.stations'), document.querySelector('footer')];
+const radio = initRadio(config.playlist);
+const outsideCinema = [document.querySelector('.masthead'), byId('walk-toolbar'),
+  byId('radio'), byId('chat'), document.querySelector('footer')];
 
 function setCinema(enabled) {
   walk.classList.toggle('is-cinema', enabled);
+  radio.setCinemaMode(enabled);
   cinema.setAttribute('aria-pressed', String(enabled));
   outsideCinema.forEach((element) => { element.inert = enabled; });
   document.body.style.overflow = enabled ? 'hidden' : '';
@@ -134,23 +137,6 @@ document.addEventListener('fullscreenchange', () => {
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && walk.classList.contains('is-cinema')) setCinema(false);
-});
-
-byId('playlist-link').href = 'https://www.youtube.com/playlist?list=' + config.playlist;
-byId('tune').addEventListener('click', () => {
-  const iframe = document.createElement('iframe');
-  const url = new URL('https://www.youtube-nocookie.com/embed');
-  url.search = new URLSearchParams({
-    listType: 'playlist', list: config.playlist, controls: '1', playsinline: '1', autoplay: '0',
-  });
-  iframe.title = 'DJ Quade archived sets on YouTube';
-  iframe.src = url;
-  iframe.allow = 'encrypted-media; picture-in-picture; fullscreen';
-  iframe.allowFullscreen = true;
-  iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-  byId('tune').replaceWith(iframe);
-  iframe.focus();
-  byId('radio-hint').textContent = 'If a set is unavailable here, open the playlist on YouTube.';
 });
 
 initChat(config);

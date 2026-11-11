@@ -1,10 +1,12 @@
-# RoboBlueCat Radio · Magenta Memories
+# RoboBlueCat Radio
 
 Static radio room with a muted Japan walk, the supplied animated RoboBlueCat, DJ Quade’s YouTube playlist, and a public nickname chat.
 
 Serve `docs/` over HTTP for local development. On GitHub Pages, use the `main` branch and `/docs`. The folder also works as a Render static publish directory wherever bandwidth and domain limits fit the budget.
 
 The licensed footage is a separate GitHub release asset. The streaming copy is 720p H.264 with fast-start and no audio track. The original file is stored separately. Visual effects are browser-side CSS, and the original GIF plays over the effects layer.
+
+The embedded YouTube player chooses a random playlist entry on load. Browsers that block sound autoplay get a muted retry and an Enable sound button. The player starts only once enough of it is visible, and cinema mode pauses it while the walk covers the page.
 
 The frontend uses only a Supabase publishable key. The migration creates a bounded public chat feed, a validated posting RPC with cooldowns, and a Realtime subscription. The client uses REST to recover missed messages if a connection drops. Apply the migration only in a dedicated project and set the URL and public key in `docs/config.js`.
 
